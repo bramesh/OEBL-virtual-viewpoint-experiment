@@ -34,7 +34,7 @@ public class TargetTrigger : MonoBehaviour
     }
 
     void Update() {
-      // Run next trial if timer eclipses 0.1 sec
+      // Run next trial if 0.5 sec elapses
       if (inTrigger) {
         rend.material.color = darkGreen;
         if ((Time.time - localStartTime) > stayInTriggerFor) {

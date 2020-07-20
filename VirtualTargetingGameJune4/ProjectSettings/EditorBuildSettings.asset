@@ -6,12 +6,36 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/CursorGameFromLeft.unity
+    path: Assets/Scenes/Password.unity
+    guid: ef8f9c236acaf4034bc333a47c419d10
+  - enabled: 1
+    path: Assets/Scenes/Log In.unity
+    guid: 5bfa4c167a7f446b8b5c7e7bf8aa5b88
+  - enabled: 1
+    path: Assets/Scenes/Instructions/1-Instructions.unity
+    guid: 1a686f700c0c64b678d1649f01aed428
+  - enabled: 1
+    path: Assets/Scenes/Instructions/2-Instructions.unity
+    guid: 100cdcda791c64b419e2ec5aa0e83c58
+  - enabled: 1
+    path: Assets/Scenes/Instructions/3-Instructions.unity
+    guid: a261d108d58a642c58c2f93826180a2f
+  - enabled: 1
+    path: Assets/Scenes/Instructions/4-Instructions.unity
+    guid: 2265074eb750a49d7a46636909943da0
+  - enabled: 1
+    path: Assets/Scenes/Instructions/5-Instructions.unity
+    guid: 6e2d254e0f7fc4a78b65eee8628e4ee3
+  - enabled: 1
+    path: Assets/Scenes/Instructions/6-Instructions.unity
+    guid: 35a6d2f090b1546098b92b61eb4c0276
+  - enabled: 1
+    path: Assets/Scenes/CursorGame.unity
     guid: 82c5bb8ec7a2a405b9f0dd71d0a391b3
   - enabled: 1
-    path: Assets/Credits.unity
-    guid: 331e6a2cfa6c5425bb27657a6e9d5a26
+    path: Assets/Scenes/Intermission.unity
+    guid: eb3a9ec4eb3964027a3922628d5ae380
   - enabled: 1
-    path: Assets/Credits 2.unity
-    guid: edc915ad666974704a1a616dbd171573
+    path: Assets/Scenes/Credits.unity
+    guid: 331e6a2cfa6c5425bb27657a6e9d5a26
   m_configObjects: {}

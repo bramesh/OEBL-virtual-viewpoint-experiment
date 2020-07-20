@@ -4,147 +4,156 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Networking;
 
 public class GameManager : MonoBehaviour
 {
 
-  public float restartDelay = 0.1f;
+    public float restartDelay = 0.1f;
 
-  private float startTime;
-  private float endTime;
+    private float startTime;
+    private float endTime;
 
-  private static System.Random rng = new System.Random(); // To randomize viewpoints
-  bool validViewpoint; // To track when a new viewpoint has been found
+    private float distance = 0;
+    private double x_diff;
+    private double z_diff;
 
-  // Function to start timer
-  public void StartTimer(){
-    startTime = Time.time;
-  }
+    private float polar_angle;
+    private float azimuthal_angle;
 
-  // Function to end timer
-  public void EndTimer(){
-    endTime = Time.time;
-  }
+    private float x_location;
+    private float y_location;
+    private float z_location;
+    private float residual_distance;
+    private float x_rotation;
+    private float y_rotation;
+    private float z_rotation;
 
-  // Function to be run when level is completed
-  public void CompleteLevel(){
-    GlobalControl.Instance.cursorMovement = false;
-    Debug.Log("Trial complete.");
-    Debug.Log(GlobalControl.Instance.trialNumber);
-    GlobalControl.Instance.viewpointOrder[0] = 1;
+    private bool is_running = false;
 
-    // Add trial time to list
-    GlobalControl.Instance.trialTimes[GlobalControl.Instance.trialNumber] = endTime - startTime;
-
-    // If all trials have been completed, load the credit scene
-    if(GlobalControl.Instance.trialNumber >= ((GlobalControl.numberOfTrials*GlobalControl.numberOfViewpoints)-1)) {
-      Debug.Log("Here");
-      SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    public void StartTimer()
+    {
+        startTime = Time.time;
+        ZeroDistance();
     }
 
-    // If the trial is the last for the current viewpoint
-    if ((GlobalControl.Instance.trialNumber + 1)%GlobalControl.numberOfTrials == 0){
-
-      for (int i = 0; i < 30; i++){
-        Debug.Log(GlobalControl.Instance.trialIDs[i]);
-      }
-      validViewpoint = false;
-
-      // Get the next random viewpoint
-      while(!validViewpoint){
-        if (!GlobalControl.Instance.viewpointOrder.Contains(0)) {
-          break;
-        }
-        GlobalControl.Instance.nextCameraPosition = rng.Next(1, 17);
-        if (!GlobalControl.Instance.viewpointOrder.Contains(GlobalControl.Instance.nextCameraPosition)){
-          Debug.Log("Viewpoint complete.");
-
-          // Valid viewpoint has been found
-          validViewpoint = true;
-
-          // Record the next camera position
-          GlobalControl.Instance.viewpointOrder[(GlobalControl.Instance.trialNumber + 1)/GlobalControl.numberOfTrials] = GlobalControl.Instance.nextCameraPosition;
-        }
-      }
+    public void ZeroDistance()
+    {
+        distance = 0f;
     }
 
-    // Increment the trial number
-    GlobalControl.Instance.trialNumber = GlobalControl.Instance.trialNumber + 1;
+    public void EndTimer()
+    {
+        endTime = Time.time;
+    }
 
-    Debug.Log("EndCompleteLevel");
+    public void AddDistance(float firstX, float firstZ, float secondX, float secondZ)
+    {
+        x_diff = (double)(firstX - secondX);
+        z_diff = (double)(firstZ - secondZ);
 
-    Invoke("Restart", restartDelay);
-  }
+        distance = distance + (float)Math.Sqrt(x_diff * x_diff + z_diff * z_diff);
+    }
+
+    public void CompleteLevel()
+    {
+        if (is_running)
+        {
+            return;
+        }
+        else
+        {
+            is_running = true;
+            StartCoroutine(CallCompleteLevel());
+        }
+        
+
+    }
+
+    // Function to be run when level is completed
+    IEnumerator CallCompleteLevel() {
+
+        Debug.Log("Trial Complete: " + GlobalControl.Instance.trialNumber.ToString());
+        Debug.Log("Viewpoint Complete: " + (GlobalControl.Instance.viewpointNumber - 1).ToString());
+
+        // Add trial time to list
+        // GlobalControl.Instance.trialTimes[GlobalControl.Instance.trialNumber] = endTime - startTime;
+
+        // Write time to database
+        WWWForm form = new WWWForm();
+        form.AddField("id", GlobalControl.Instance.subjectID);
+        form.AddField("trialNumber", GlobalControl.Instance.trialNumber);
+        form.AddField("polarAngle", GlobalControl.Instance.cameraPositions[GlobalControl.Instance.viewpointNumber - 1][0]);
+        form.AddField("azimuthalAngle", GlobalControl.Instance.cameraPositions[GlobalControl.Instance.viewpointNumber - 1][1]);
+        form.AddField("time", (endTime - startTime).ToString());
+        form.AddField("distance", distance.ToString());
+
+        //WWW www = new WWW("http://oeblviewpoints.000webhostapp.com//trial.php", form);
+        //yield return www;
+        //http://localhost:8888/virtualexperiment/trial.php
+
+        using (UnityWebRequest www = UnityWebRequest.Post("http://oeblviewpoints.000webhostapp.com//trial.php", form))
+        {
+            yield return www.SendWebRequest();
+        }
+
+        // If all trials have been completed, load the credit scene
+        if (GlobalControl.Instance.trialNumber == (GlobalControl.numberOfTrials * GlobalControl.numberOfViewpoints - 1))
+        {
+            Debug.Log("Here");
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 2);
+            yield break;
+        }
+
+        // If the trial is the last for the current viewpoint
+        if ((GlobalControl.Instance.trialNumber + 1) % GlobalControl.numberOfTrials == 0)
+        {
+            Debug.Log("Herez");
+            GlobalControl.Instance.trialNumber = GlobalControl.Instance.trialNumber + 1;
+            GlobalControl.Instance.viewpointNumber = GlobalControl.Instance.viewpointNumber + 1;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            yield break;
+        }
+
+        // Increment the trial number
+        GlobalControl.Instance.trialNumber = GlobalControl.Instance.trialNumber + 1;
+
+        Debug.Log("EndCompleteLevel");
+
+        is_running = false;
+
+        //Invoke("Restart", restartDelay);
+        Restart();
+    }
 
   // Reloads the current scene
-  public void Restart() {
-    GlobalControl.Instance.cursorMovement = true;
-    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    Debug.Log("Camera Position" + GlobalControl.Instance.nextCameraPosition);
-  }
-
-  void Update() {
-    if (GlobalControl.Instance.nextCameraPosition == 0) {
-      GlobalControl.Instance.nextCameraPosition = 1;
-      GlobalControl.Instance.viewpointOrder[0] = 1;
+  public void Restart()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
-    SetCameraPose(GlobalControl.Instance.nextCameraPosition);
-  }
+
+  void Update()
+    {
+        SetCameraPose();
+    }
 
   // Set the camera pose for a given viewpoint
-  public void SetCameraPose(int viewpoint) {
-    if (viewpoint == 1){
-      Camera.main.transform.position = new Vector3(0f, 7.5f, -13f);
-      Camera.main.transform.rotation = Quaternion.Euler(30f, 0f, 0f);
-    } else if (viewpoint == 2){
-      Camera.main.transform.position = new Vector3(-6.5f, 7.5f, -11.26f);
-      Camera.main.transform.rotation = Quaternion.Euler(30f, 30f, 0f);
-    } else if (viewpoint == 3){
-      Camera.main.transform.position = new Vector3(-11.26f, 7.5f, -6.5f);
-      Camera.main.transform.rotation = Quaternion.Euler(30f, 60f, 0f);
-    } else if (viewpoint == 4){
-      Camera.main.transform.position = new Vector3(-13f, 7.5f, 0f);
-      Camera.main.transform.rotation = Quaternion.Euler(30f, 90f, 0f);
-    } else if (viewpoint == 5){
-      Camera.main.transform.position = new Vector3(-11.26f, 7.5f, 6.5f);
-      Camera.main.transform.rotation = Quaternion.Euler(30f, 120f, 0f);
-    } else if (viewpoint == 6){
-      Camera.main.transform.position = new Vector3(-6.5f, 7.5f, 11.26f);
-      Camera.main.transform.rotation = Quaternion.Euler(30f, 150f, 0f);
-    } else if (viewpoint == 7){
-      Camera.main.transform.position = new Vector3(0f, 7.5f, 13f);
-      Camera.main.transform.rotation = Quaternion.Euler(30f, 180f, 0f);
-    } else if (viewpoint == 8){
-      Camera.main.transform.position = new Vector3(6.5f, 7.5f, 11.26f);
-      Camera.main.transform.rotation = Quaternion.Euler(30f, 210f, 0f);
-    } else if (viewpoint == 9){
-      Camera.main.transform.position = new Vector3(11.26f, 7.5f, 6.5f);
-      Camera.main.transform.rotation = Quaternion.Euler(30f, 240f, 0f);
-    } else if (viewpoint == 10){
-      Camera.main.transform.position = new Vector3(13f, 7.5f, 0f);
-      Camera.main.transform.rotation = Quaternion.Euler(30f, 270f, 0f);
-    } else if (viewpoint == 11){
-      Camera.main.transform.position = new Vector3(11.26f, 7.5f, -6.5f);
-      Camera.main.transform.rotation = Quaternion.Euler(30f, 300f, 0f);
-    } else if (viewpoint == 12){
-      Camera.main.transform.position = new Vector3(6.5f, 7.5f, -11.26f);
-      Camera.main.transform.rotation = Quaternion.Euler(30f, 330f, 0f);
-    } else if (viewpoint == 13){
-      Camera.main.transform.position = new Vector3(0f, 13f, -7.5f);
-      Camera.main.transform.rotation = Quaternion.Euler(60f, 0f, 0f);
-    } else if (viewpoint == 14){
-      Camera.main.transform.position = new Vector3(0f, 15f, 0f);
-      Camera.main.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-    } else if (viewpoint == 15){
-      Camera.main.transform.position = new Vector3(0f, 13f, 7.5f);
-      Camera.main.transform.rotation = Quaternion.Euler(120f, 0f, 0f);
-    } else if (viewpoint == 16){
-      Camera.main.transform.position = new Vector3(0f, 7.5f, 13f);
-      Camera.main.transform.rotation = Quaternion.Euler(150f, 0f, 0f);
-    } else {
-      Camera.main.transform.position = new Vector3(0f, 7.5f, -13f);
-      Camera.main.transform.rotation = Quaternion.Euler(30f, 0f, 0f);
-    }
+  public void SetCameraPose() {
+        polar_angle = GlobalControl.Instance.cameraPositions[GlobalControl.Instance.viewpointNumber - 1][0] * (float) Math.PI / 180f;
+        azimuthal_angle = GlobalControl.Instance.cameraPositions[GlobalControl.Instance.viewpointNumber - 1][1] * (float)Math.PI / 180f;
+
+        y_location = 15f * (float) Math.Cos((double)azimuthal_angle);
+        residual_distance = (float) Math.Sqrt((double)(225f - y_location*y_location));
+        x_location = Math.Sign((double) azimuthal_angle) * residual_distance * (float) Math.Sin( (double) polar_angle);
+        z_location = Math.Sign((double)azimuthal_angle) * residual_distance * (float) Math.Cos( (double) polar_angle);
+
+        x_rotation = 90f + GlobalControl.Instance.cameraPositions[GlobalControl.Instance.viewpointNumber - 1][1];
+        y_rotation = GlobalControl.Instance.cameraPositions[GlobalControl.Instance.viewpointNumber - 1][0];
+        z_rotation = 0f;
+
+        Camera.main.transform.position = new Vector3(x_location, y_location, z_location);
+        Camera.main.transform.rotation = Quaternion.Euler(x_rotation, y_rotation, z_rotation);
+
   }
 
 }
