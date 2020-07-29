@@ -8,7 +8,7 @@ public class CursorMovement : MonoBehaviour
 
     // Enable if using mouse control
     private Vector3 mousePosition;
-    private Vector3 direction;
+    private Vector3 direction = new Vector3();
     public float controlFactor = 0.001f;
     bool firstClick = true;
 
@@ -24,10 +24,13 @@ public class CursorMovement : MonoBehaviour
 
     public float controlForce = 500f;
 
+    // Enable if using mouse control
+    public bool trackpadMovement = false;
 
     // Update is called once per frame
     void FixedUpdate()
     {
+        /*
         if( Input.GetKey("left"))
         {
             // Get the start time of movement
@@ -72,37 +75,93 @@ public class CursorMovement : MonoBehaviour
             rb.AddForce(0, 0, -controlForce * Time.deltaTime, ForceMode.VelocityChange);
             //transform.Translate(0, 0, -controlForce);
         }
+        */
 
-        // Enable if using mouse control
+        direction.x = 0f;
+        direction.y = 0f;
+        direction.z = 0f;
 
-        // If the left button is clicked
-        if( Input.GetMouseButton(0) )
+        if (Input.GetKey("left"))
         {
-            // Get the start time of movement
-            if(!timerStarted)
+            if (!timerStarted)
             {
                 timerStarted = true;
                 gameManager.StartTimer();
             }
 
-            if( firstClick )
+            direction.x += -1f;
+        }
+
+        if (Input.GetKey("right"))
+        {
+            if (!timerStarted)
             {
-                mousePosition = Input.mousePosition;
-                firstClick = false;
+                timerStarted = true;
+                gameManager.StartTimer();
+            }
+
+            direction.x += 1f;
+        }
+
+        if (Input.GetKey("up"))
+        {
+            if (!timerStarted)
+            {
+                timerStarted = true;
+                gameManager.StartTimer();
+            }
+
+            direction.z += 1f;
+        }
+
+        if (Input.GetKey("down"))
+        {
+            if (!timerStarted)
+            {
+                timerStarted = true;
+                gameManager.StartTimer();
+            }
+
+            direction.z += -1f;
+        }
+
+        if (direction.magnitude > 0)
+        {
+            rb.AddForce(controlForce*direction.x / direction.magnitude, 0, controlForce*direction.z / direction.magnitude, ForceMode.VelocityChange);
+        }
+
+        if (trackpadMovement)
+        {
+            // If the left button is clicked
+            if (Input.GetMouseButton(0))
+            {
+                // Get the start time of movement
+                if (!timerStarted)
+                {
+                    timerStarted = true;
+                    gameManager.StartTimer();
+                }
+
+                if (firstClick)
+                {
+                    mousePosition = Input.mousePosition;
+                    firstClick = false;
+                }
+                else
+                {
+                    direction = Input.mousePosition - mousePosition;
+                    //rb.AddForce(direction.x * 10, 0, direction.y * 10);
+                    transform.Translate(direction.x * controlFactor, 0, direction.y * controlFactor);
+                    mousePosition = Input.mousePosition;
+                }
+
             }
             else
             {
-                direction = Input.mousePosition - mousePosition;
-                //rb.AddForce(direction.x * 10, 0, direction.y * 10);
-                transform.Translate(direction.x * controlFactor, 0, direction.y * controlFactor);
-                mousePosition = Input.mousePosition;
+                firstClick = true;
             }
-
         }
-        else
-        {
-            firstClick = true;
-        }
+        
 
         if (rb.position.y < 0)
         {

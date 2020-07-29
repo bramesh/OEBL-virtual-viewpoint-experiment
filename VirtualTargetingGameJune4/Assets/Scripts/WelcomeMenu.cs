@@ -39,15 +39,18 @@ public class WelcomeMenu : MonoBehaviour
     static int[] cam23 = new int[2] { 270, 60 };
     static int[] cam24 = new int[2] { 315, 60 };
 
+    int[] changedCameraPosition;
+
+    private int[][] cameraPositions = new int[][] { cam2, cam3, cam4, cam5, cam6, cam7, cam8, cam9, cam10, cam11, cam12, cam13, cam14, cam15, cam16, cam17, cam18, cam19, cam20, cam21, cam22, cam23, cam24 };
+
     public void CallLogin()
     {
-        if (Int32.Parse(idField.text)%2 == 0)
-        {
-            GlobalControl.Instance.cameraPositions = new int[][] { cam1, cam4, cam6, cam7, cam10, cam11, cam13, cam16, cam17, cam20, cam22, cam23 };
-        } else
-        {
-            GlobalControl.Instance.cameraPositions = new int[][] { cam2, cam3, cam5, cam8, cam9, cam12, cam14, cam15, cam18, cam19, cam21, cam24 };
-        }
+        // Define camera positions
+        changedCameraPosition = cameraPositions[Int32.Parse(idField.text) % 23];
+        GlobalControl.Instance.cameraPositions = new int[][] { cam1, cam1, cam1, changedCameraPosition, changedCameraPosition, changedCameraPosition };
+
+        // Scramble target configs before first viewpoint
+        Randomizer.Randomize(GlobalControl.Instance.targetConfig);
 
         StartCoroutine(LogIn());
     }
@@ -86,7 +89,7 @@ public class WelcomeMenu : MonoBehaviour
             {
                 Debug.Log("User logged in successfully.");
                 GlobalControl.Instance.subjectID = idField.text;
-                Randomizer.Randomize(GlobalControl.Instance.cameraPositions);
+                //Randomizer.Randomize(GlobalControl.Instance.cameraPositions);
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
             }
             else

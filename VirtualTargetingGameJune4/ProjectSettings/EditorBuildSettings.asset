@@ -12,22 +12,25 @@ EditorBuildSettings:
     path: Assets/Scenes/Log In.unity
     guid: 5bfa4c167a7f446b8b5c7e7bf8aa5b88
   - enabled: 1
-    path: Assets/Scenes/Instructions/1-Instructions.unity
-    guid: 1a686f700c0c64b678d1649f01aed428
-  - enabled: 1
     path: Assets/Scenes/Instructions/2-Instructions.unity
-    guid: 100cdcda791c64b419e2ec5aa0e83c58
+    guid: 756b5e18f907f46f39442200daa22706
   - enabled: 1
     path: Assets/Scenes/Instructions/3-Instructions.unity
-    guid: a261d108d58a642c58c2f93826180a2f
+    guid: 100cdcda791c64b419e2ec5aa0e83c58
   - enabled: 1
     path: Assets/Scenes/Instructions/4-Instructions.unity
     guid: 2265074eb750a49d7a46636909943da0
   - enabled: 1
     path: Assets/Scenes/Instructions/5-Instructions.unity
-    guid: 6e2d254e0f7fc4a78b65eee8628e4ee3
+    guid: a261d108d58a642c58c2f93826180a2f
   - enabled: 1
     path: Assets/Scenes/Instructions/6-Instructions.unity
+    guid: 7bc9033d3f2af47ab8b9983be4115e21
+  - enabled: 1
+    path: Assets/Scenes/Instructions/7-Instructions.unity
+    guid: 6e2d254e0f7fc4a78b65eee8628e4ee3
+  - enabled: 1
+    path: Assets/Scenes/Instructions/8-Instructions.unity
     guid: 35a6d2f090b1546098b92b61eb4c0276
   - enabled: 1
     path: Assets/Scenes/CursorGame.unity

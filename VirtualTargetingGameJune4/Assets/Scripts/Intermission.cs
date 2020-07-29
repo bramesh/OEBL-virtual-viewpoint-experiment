@@ -9,7 +9,7 @@ public class Intermission : MonoBehaviour
 
     void Start()
     {
-        viewpointsRemaining.text = (GlobalControl.numberOfViewpoints - GlobalControl.Instance.viewpointNumber + 1).ToString() + " Viewpoint(s) Remaining";
+        viewpointsRemaining.text = (GlobalControl.numberOfViewpoints - GlobalControl.Instance.viewpointNumber + 1).ToString() + " Rounds(s) Remaining";
     }
 
     

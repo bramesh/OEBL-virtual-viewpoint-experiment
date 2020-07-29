@@ -31,22 +31,26 @@ public class GameManager : MonoBehaviour
 
     private bool is_running = false;
 
+    // Start the trial timer and zero trial distance
     public void StartTimer()
     {
         startTime = Time.time;
         ZeroDistance();
     }
 
+    // Helper function to zero distance
     public void ZeroDistance()
     {
         distance = 0f;
     }
 
+    // End the trial timer
     public void EndTimer()
     {
         endTime = Time.time;
     }
 
+    // Add the distance traveled since last update
     public void AddDistance(float firstX, float firstZ, float secondX, float secondZ)
     {
         x_diff = (double)(firstX - secondX);
@@ -55,6 +59,7 @@ public class GameManager : MonoBehaviour
         distance = distance + (float)Math.Sqrt(x_diff * x_diff + z_diff * z_diff);
     }
 
+    // Start coroutine
     public void CompleteLevel()
     {
         if (is_running)
@@ -76,8 +81,6 @@ public class GameManager : MonoBehaviour
         Debug.Log("Trial Complete: " + GlobalControl.Instance.trialNumber.ToString());
         Debug.Log("Viewpoint Complete: " + (GlobalControl.Instance.viewpointNumber - 1).ToString());
 
-        // Add trial time to list
-        // GlobalControl.Instance.trialTimes[GlobalControl.Instance.trialNumber] = endTime - startTime;
 
         // Write time to database
         WWWForm form = new WWWForm();
@@ -85,6 +88,8 @@ public class GameManager : MonoBehaviour
         form.AddField("trialNumber", GlobalControl.Instance.trialNumber);
         form.AddField("polarAngle", GlobalControl.Instance.cameraPositions[GlobalControl.Instance.viewpointNumber - 1][0]);
         form.AddField("azimuthalAngle", GlobalControl.Instance.cameraPositions[GlobalControl.Instance.viewpointNumber - 1][1]);
+        form.AddField("indexOfDifficulty", GlobalControl.Instance.targetConfig[GlobalControl.Instance.trialNumber % GlobalControl.numberOfTrials][0].ToString());
+        form.AddField("targetDirection", ((180 / Mathf.PI) * GlobalControl.Instance.targetConfig[GlobalControl.Instance.trialNumber % GlobalControl.numberOfTrials][1]).ToString());
         form.AddField("time", (endTime - startTime).ToString());
         form.AddField("distance", distance.ToString());
 
@@ -109,6 +114,9 @@ public class GameManager : MonoBehaviour
         if ((GlobalControl.Instance.trialNumber + 1) % GlobalControl.numberOfTrials == 0)
         {
             Debug.Log("Herez");
+            // Scramble target configs
+            WelcomeMenu.Randomizer.Randomize(GlobalControl.Instance.targetConfig);
+
             GlobalControl.Instance.trialNumber = GlobalControl.Instance.trialNumber + 1;
             GlobalControl.Instance.viewpointNumber = GlobalControl.Instance.viewpointNumber + 1;
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
