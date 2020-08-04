@@ -39,6 +39,8 @@ public class WelcomeMenu : MonoBehaviour
     static int[] cam23 = new int[2] { 270, 60 };
     static int[] cam24 = new int[2] { 315, 60 };
 
+    System.Random rnd = new System.Random();
+
     int[] changedCameraPosition;
 
     private int[][] cameraPositions = new int[][] { cam2, cam3, cam4, cam5, cam6, cam7, cam8, cam9, cam10, cam11, cam12, cam13, cam14, cam15, cam16, cam17, cam18, cam19, cam20, cam21, cam22, cam23, cam24 };
@@ -52,6 +54,19 @@ public class WelcomeMenu : MonoBehaviour
         // Scramble target configs before first viewpoint
         Randomizer.Randomize(GlobalControl.Instance.targetConfig);
 
+        // Set the random scenes after which to run catch trials
+        while (Array.Exists(GlobalControl.Instance.catchTrialLocations, element => element == 0))
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                int nextLocation = rnd.Next(5, GlobalControl.numberOfTrials * GlobalControl.numberOfViewpoints - 5);
+                if (GlobalControl.Instance.catchTrialLocations[i] == 0 && !Array.Exists(GlobalControl.Instance.catchTrialLocations, element => element == nextLocation))
+                {
+                    GlobalControl.Instance.catchTrialLocations[i] = nextLocation;
+                }
+            }
+        }
+
         StartCoroutine(LogIn());
     }
 
@@ -59,24 +74,6 @@ public class WelcomeMenu : MonoBehaviour
     {
         WWWForm form = new WWWForm();
         form.AddField("id", idField.text);
-        //WWW www = new WWW("http://oeblviewpoints.000webhostapp.com//login.php", form);
-        //yield return www;
-        //http://localhost:8888/virtualexperiment/login.php
-
-        //if (www.text == "0")
-        //{
-        //    Debug.Log("User logged in successfully.");
-        //    GlobalControl.Instance.subjectID = idField.text;
-        //    Randomizer.Randomize(GlobalControl.Instance.cameraPositions);
-        //    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-        //} else if (www.text == "")
-        //{
-        //    informationDisplay.text = ("Server communication failed.");
-        //}
-        //else
-        //{
-        //    informationDisplay.text = ("User login failed. Error #" + www.text);
-        //}
 
         using (UnityWebRequest www = UnityWebRequest.Post("http://oeblviewpoints.000webhostapp.com//login.php", form))
         {

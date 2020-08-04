@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public class Instructions3 : MonoBehaviour
 {
     public Button nextButton;
+    public int hitsToPass = 3;
 
     public void NextPressed()
     {
@@ -19,7 +20,7 @@ public class Instructions3 : MonoBehaviour
 
     void Update()
     {
-        if (GlobalControl.Instance.numberOfHits >= 3)
+        if (GlobalControl.Instance.numberOfHits >= hitsToPass)
         {
             nextButton.interactable = true;
         }

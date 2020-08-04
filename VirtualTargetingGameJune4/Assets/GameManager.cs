@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
+using System.Diagnostics;
 
 public class GameManager : MonoBehaviour
 {
@@ -78,9 +79,7 @@ public class GameManager : MonoBehaviour
     // Function to be run when level is completed
     IEnumerator CallCompleteLevel() {
 
-        Debug.Log("Trial Complete: " + GlobalControl.Instance.trialNumber.ToString());
-        Debug.Log("Viewpoint Complete: " + (GlobalControl.Instance.viewpointNumber - 1).ToString());
-
+        UnityEngine.Debug.Log("Trial Complete: " + GlobalControl.Instance.trialNumber.ToString());
 
         // Write time to database
         WWWForm form = new WWWForm();
@@ -105,15 +104,13 @@ public class GameManager : MonoBehaviour
         // If all trials have been completed, load the credit scene
         if (GlobalControl.Instance.trialNumber == (GlobalControl.numberOfTrials * GlobalControl.numberOfViewpoints - 1))
         {
-            Debug.Log("Here");
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 2);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 5);
             yield break;
         }
 
         // If the trial is the last for the current viewpoint
         if ((GlobalControl.Instance.trialNumber + 1) % GlobalControl.numberOfTrials == 0)
         {
-            Debug.Log("Herez");
             // Scramble target configs
             WelcomeMenu.Randomizer.Randomize(GlobalControl.Instance.targetConfig);
 
@@ -126,12 +123,18 @@ public class GameManager : MonoBehaviour
         // Increment the trial number
         GlobalControl.Instance.trialNumber = GlobalControl.Instance.trialNumber + 1;
 
-        Debug.Log("EndCompleteLevel");
-
         is_running = false;
 
-        //Invoke("Restart", restartDelay);
-        Restart();
+        // If it is time for a catch trial
+        if (Array.Exists(GlobalControl.Instance.catchTrialLocations, element => element == GlobalControl.Instance.trialNumber))
+        {
+            UnityEngine.Debug.Log("In catch trial if");
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 2 + Array.IndexOf(GlobalControl.Instance.catchTrialLocations, GlobalControl.Instance.trialNumber));
+        } else
+        {
+            Restart();
+        }
+        
     }
 
   // Reloads the current scene
@@ -150,8 +153,8 @@ public class GameManager : MonoBehaviour
         polar_angle = GlobalControl.Instance.cameraPositions[GlobalControl.Instance.viewpointNumber - 1][0] * (float) Math.PI / 180f;
         azimuthal_angle = GlobalControl.Instance.cameraPositions[GlobalControl.Instance.viewpointNumber - 1][1] * (float)Math.PI / 180f;
 
-        y_location = 15f * (float) Math.Cos((double)azimuthal_angle);
-        residual_distance = (float) Math.Sqrt((double)(225f - y_location*y_location));
+        y_location = 20f * (float) Math.Cos((double)azimuthal_angle);
+        residual_distance = (float) Math.Sqrt((double)(400f - y_location*y_location));
         x_location = Math.Sign((double) azimuthal_angle) * residual_distance * (float) Math.Sin( (double) polar_angle);
         z_location = Math.Sign((double)azimuthal_angle) * residual_distance * (float) Math.Cos( (double) polar_angle);
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,7 +6,7 @@ using UnityEngine;
 public class TargetPosition : MonoBehaviour
 {
     System.Random rnd = new System.Random();
-    private float radius = 5f;
+    private float radius; // = 5f;
     private float id;
     private float scale;
     private float angle;
@@ -24,7 +25,7 @@ public class TargetPosition : MonoBehaviour
         if (instructionMode)
         {
             bool goodAngle = false;
-            float angle = Random.Range(0f, 6.28f); // Random angle in radians
+            float angle = UnityEngine.Random.Range(0f, 6.28f); // Random angle in radians
 
             while (!goodAngle)
             {
@@ -34,7 +35,7 @@ public class TargetPosition : MonoBehaviour
                 }
                 else
                 {
-                    angle = Random.Range(0f, 6.28f);
+                    angle = UnityEngine.Random.Range(0f, 6.28f);
                 }
             }
 
@@ -49,6 +50,14 @@ public class TargetPosition : MonoBehaviour
             id = GlobalControl.Instance.targetConfig[GlobalControl.Instance.trialNumber % GlobalControl.numberOfTrials][0];
             scale = 10f / (Mathf.Pow(2f, id));
             angle = GlobalControl.Instance.targetConfig[GlobalControl.Instance.trialNumber % GlobalControl.numberOfTrials][1];
+            
+            if ((int)(angle / (Math.PI / 4)) % 2 == 1)
+            {
+                radius = 2.5f * (float)Math.Sqrt(2); 
+            } else
+            {
+                radius = 5f;
+            }
 
             x_location = radius * (float)System.Math.Sin((double)angle);
             z_location = radius * (float)System.Math.Cos((double)angle);

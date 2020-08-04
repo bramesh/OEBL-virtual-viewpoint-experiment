@@ -16,28 +16,43 @@ EditorBuildSettings:
     guid: 756b5e18f907f46f39442200daa22706
   - enabled: 1
     path: Assets/Scenes/Instructions/3-Instructions.unity
-    guid: 100cdcda791c64b419e2ec5aa0e83c58
+    guid: de026df0e9618ee42841a1541d964d0f
   - enabled: 1
     path: Assets/Scenes/Instructions/4-Instructions.unity
-    guid: 2265074eb750a49d7a46636909943da0
+    guid: 100cdcda791c64b419e2ec5aa0e83c58
   - enabled: 1
     path: Assets/Scenes/Instructions/5-Instructions.unity
-    guid: a261d108d58a642c58c2f93826180a2f
+    guid: 2265074eb750a49d7a46636909943da0
   - enabled: 1
     path: Assets/Scenes/Instructions/6-Instructions.unity
-    guid: 7bc9033d3f2af47ab8b9983be4115e21
+    guid: b66c4ccc1a9d4274882172217cfa5bd1
   - enabled: 1
     path: Assets/Scenes/Instructions/7-Instructions.unity
-    guid: 6e2d254e0f7fc4a78b65eee8628e4ee3
+    guid: a261d108d58a642c58c2f93826180a2f
   - enabled: 1
     path: Assets/Scenes/Instructions/8-Instructions.unity
+    guid: 7bc9033d3f2af47ab8b9983be4115e21
+  - enabled: 1
+    path: Assets/Scenes/Instructions/9-Instructions.unity
+    guid: 6e2d254e0f7fc4a78b65eee8628e4ee3
+  - enabled: 1
+    path: Assets/Scenes/Instructions/10-Instructions.unity
     guid: 35a6d2f090b1546098b92b61eb4c0276
   - enabled: 1
     path: Assets/Scenes/CursorGame.unity
     guid: 82c5bb8ec7a2a405b9f0dd71d0a391b3
   - enabled: 1
     path: Assets/Scenes/Intermission.unity
+    guid: e05167e8389fdd24f8ee3f40bdbe1da0
+  - enabled: 1
+    path: Assets/Scenes/CatchTrials/CatchTrialRed.unity
     guid: eb3a9ec4eb3964027a3922628d5ae380
+  - enabled: 1
+    path: Assets/Scenes/CatchTrials/CatchTrialBlue.unity
+    guid: c31ecd916cf0d664b983ccb8d7b0cfce
+  - enabled: 1
+    path: Assets/Scenes/CatchTrials/CatchTrialGreen.unity
+    guid: 1e38f894e7746284898058061e91d379
   - enabled: 1
     path: Assets/Scenes/Credits.unity
     guid: 331e6a2cfa6c5425bb27657a6e9d5a26

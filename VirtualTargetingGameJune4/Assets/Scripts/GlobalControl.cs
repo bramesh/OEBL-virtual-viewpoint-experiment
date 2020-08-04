@@ -18,7 +18,7 @@ public class GlobalControl : MonoBehaviour
     static float[] set1 = new float[2] { 2, 0 };
     static float[] set2 = new float[2] { 2, Mathf.PI / 4f };
     static float[] set3 = new float[2] { 2, Mathf.PI / 2f };
-    static float[] set4 = new float[2] { 2, 3*Mathf.PI / 4f };
+    static float[] set4 = new float[2] { 2, 3 * Mathf.PI / 4f };
     static float[] set5 = new float[2] { 2, Mathf.PI };
     static float[] set6 = new float[2] { 2, 5 * Mathf.PI / 4f };
     static float[] set7 = new float[2] { 2, 3 * Mathf.PI / 2f };
@@ -47,6 +47,11 @@ public class GlobalControl : MonoBehaviour
     public bool testFall = false;
 
     public int[][] cameraPositions; // = new int[][] { cam1, cam2, cam3, cam4, cam5, cam6, cam7, cam8, cam9, cam10, cam11, cam12, cam13, cam14, cam15, cam16, cam17, cam18, cam19, cam20, cam21, cam22, cam23, cam24 };
+
+    // Catch trial results
+    public int[] catchTrialLocations = new int[] { 0, 0, 0 };
+    public float[] catchTrialTimes = new float[] { 0, 0, 0 };
+    public bool[] catchTrialResults = new bool[] { false, false, false };
 
     void Awake(){
       if(Instance == null){

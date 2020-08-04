@@ -1,16 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.Networking;
 
 public class CursorMovement : MonoBehaviour
 {
-
-    // Enable if using mouse control
-    private Vector3 mousePosition;
-    private Vector3 direction = new Vector3();
-    public float controlFactor = 0.001f;
-    bool firstClick = true;
+    // Vector for storing force data
+    private Vector3 force;
+    public float controlForce = 3f;
+    public float accelerationCoef = 0.4f;
+    public float maxSpeed = 7f;
 
     public Rigidbody rb;
     private float startTime;
@@ -20,67 +22,174 @@ public class CursorMovement : MonoBehaviour
     private float x_location = 0f;
     private float z_location = 0f;
 
-    public GameManager gameManager;
+    // For single keystroke movement
+    private bool leftPressed = false;
+    private bool rightPressed = false;
+    private bool upPressed = false;
+    private bool downPressed = false;
+    private bool keyPressed = false;
+    private bool[] keysLast = new bool[] { false, false, false, false };
+    private bool[] keysCurrent = new bool[] { false, false, false, false };
 
-    public float controlForce = 500f;
+    public GameManager gameManager;
 
     // Enable if using mouse control
     public bool trackpadMovement = false;
 
+    // Enable if using mouse control
+    public float controlFactor = 0.001f;
+    private Vector3 mousePosition;
+    private Vector3 direction = new Vector3();
+    bool firstClick = true;
+
     // Update is called once per frame
     void FixedUpdate()
     {
-        /*
-        if( Input.GetKey("left"))
-        {
-            // Get the start time of movement
-            if(!timerStarted)
-            {
-                timerStarted = true;
-                gameManager.StartTimer();
-            }
-            rb.AddForce(-controlForce * Time.deltaTime, 0, 0, ForceMode.VelocityChange); // Force control
-            //transform.Translate(-controlForce, 0, 0); // Translation control
-        }
-
-        if( Input.GetKey("right"))
-        {
-            if(!timerStarted)
-            {
-                timerStarted = true;
-                gameManager.StartTimer();
-            }
-            rb.AddForce(controlForce * Time.deltaTime, 0, 0, ForceMode.VelocityChange);
-            //transform.Translate(controlForce, 0, 0);
-        }
-
-        if( Input.GetKey("up"))
-        {
-            if(!timerStarted)
-            {
-                timerStarted = true;
-                gameManager.StartTimer();
-            }
-            rb.AddForce(0, 0, controlForce * Time.deltaTime, ForceMode.VelocityChange);
-            //transform.Translate(0, 0, controlForce);
-        }
-
-        if( Input.GetKey("down"))
-        {
-            if(!timerStarted)
-            {
-                timerStarted = true;
-                gameManager.StartTimer();
-            }
-            rb.AddForce(0, 0, -controlForce * Time.deltaTime, ForceMode.VelocityChange);
-            //transform.Translate(0, 0, -controlForce);
-        }
-        */
-
+ 
         direction.x = 0f;
         direction.y = 0f;
         direction.z = 0f;
 
+        leftPressed = Input.GetKey("left");
+        rightPressed = Input.GetKey("right");
+        upPressed = Input.GetKey("up");
+        downPressed = Input.GetKey("down");
+        keysCurrent[0] = leftPressed;
+        keysCurrent[1] = rightPressed;
+        keysCurrent[2] = upPressed;
+        keysCurrent[3] = downPressed;
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (keysCurrent[i] && !keysLast[i])
+            {
+                if (i == 0)
+                {
+                    rb.AddForce(-controlForce, 0, 0, ForceMode.VelocityChange);
+                } else if (i == 1)
+                {
+                    rb.AddForce(controlForce, 0, 0, ForceMode.VelocityChange);
+                } else if (i == 2)
+                {
+                    rb.AddForce(0, 0, controlForce, ForceMode.VelocityChange);
+                } else
+                {
+                    rb.AddForce(0, 0, -controlForce, ForceMode.VelocityChange);
+                }
+                break;
+            }
+        }
+
+        keysLast[0] = keysCurrent[0];
+        keysLast[1] = keysCurrent[1];
+        keysLast[2] = keysCurrent[2];
+        keysLast[3] = keysCurrent[3];
+
+        // Single keystroke implementation
+        /*
+        if (!keyPressed)
+        {
+
+            if (leftPressed)
+            {
+                if (!Input.GetKey("left"))
+                {
+                    leftPressed = false;
+                }
+            }
+            else
+            {
+                if (Input.GetKey("left"))
+                {
+                    //rb.AddForce(-controlForce, 0, 0, ForceMode.VelocityChange);
+                    transform.Translate(-controlFactor, 0, 0);
+                    leftPressed = true;
+                    keyPressed = true;
+                    if (!timerStarted)
+                    {
+                        timerStarted = true;
+                        gameManager.StartTimer();
+                    }
+                }
+            }
+
+            if (rightPressed)
+            {
+                if (!Input.GetKey("right"))
+                {
+                    rightPressed = false;
+                }
+            }
+            else
+            {
+                if (Input.GetKey("right"))
+                {
+                    //rb.AddForce(controlForce, 0, 0, ForceMode.VelocityChange);
+                    transform.Translate(controlFactor, 0, 0);
+                    rightPressed = true;
+                    keyPressed = true;
+                    if (!timerStarted)
+                    {
+                        timerStarted = true;
+                        gameManager.StartTimer();
+                    }
+                }
+            }
+
+            if (upPressed)
+            {
+                if (!Input.GetKey("up"))
+                {
+                    upPressed = false;
+                }
+            }
+            else
+            {
+                if (Input.GetKey("up"))
+                {
+                    //rb.AddForce(0, 0, controlForce, ForceMode.VelocityChange);
+                    transform.Translate(0, 0, controlFactor);
+                    upPressed = true;
+                    keyPressed = true;
+                    if (!timerStarted)
+                    {
+                        timerStarted = true;
+                        gameManager.StartTimer();
+                    }
+                }
+            }
+
+            if (downPressed)
+            {
+                if (!Input.GetKey("down"))
+                {
+                    downPressed = false;
+                }
+            }
+            else
+            {
+                if (Input.GetKey("down"))
+                {
+                    //rb.AddForce(0, 0, -controlForce, ForceMode.VelocityChange);
+                    transform.Translate(0, 0, -controlFactor);
+                    downPressed = true;
+                    keyPressed = true;
+                    if (!timerStarted)
+                    {
+                        timerStarted = true;
+                        gameManager.StartTimer();
+                    }
+                }
+            }
+        }
+
+        if (!Input.GetKey("left") && !Input.GetKey("right") && !Input.GetKey("up") && !Input.GetKey("down"))
+        {
+            keyPressed = false;
+        }
+        */
+
+        /*
         if (Input.GetKey("left"))
         {
             if (!timerStarted)
@@ -124,11 +233,28 @@ public class CursorMovement : MonoBehaviour
 
             direction.z += -1f;
         }
+        
 
         if (direction.magnitude > 0)
         {
-            rb.AddForce(controlForce*direction.x / direction.magnitude, 0, controlForce*direction.z / direction.magnitude, ForceMode.VelocityChange);
+            force.x = accelerationCoef * controlForce * direction.x / direction.magnitude;
+            force.y = 0f;
+            force.z = accelerationCoef * controlForce * direction.z / direction.magnitude;
+
+            if (rb.velocity.magnitude > 0.1f)
+            {
+                force = force * rb.velocity.magnitude;
+            }
+
+            if (rb.velocity.magnitude > maxSpeed)
+            {
+                force = maxSpeed * force / force.magnitude;
+            }
+
+            rb.AddForce(force.x, force.y, force.z, ForceMode.VelocityChange);
+            //tansform.Translate(controlFactor * direction.x / direction.magnitude, 0, controlFactor * direction.z / direction.magnitude);
         }
+        */
 
         if (trackpadMovement)
         {
