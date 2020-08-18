@@ -27,7 +27,6 @@ public class CursorMovement : MonoBehaviour
     private bool rightPressed = false;
     private bool upPressed = false;
     private bool downPressed = false;
-    private bool keyPressed = false;
     private bool[] keysLast = new bool[] { false, false, false, false };
     private bool[] keysCurrent = new bool[] { false, false, false, false };
 
@@ -41,6 +40,12 @@ public class CursorMovement : MonoBehaviour
     private Vector3 mousePosition;
     private Vector3 direction = new Vector3();
     bool firstClick = true;
+
+    void Start()
+    {
+        GlobalControl.Instance.loadTime = Time.time;
+        GlobalControl.Instance.trajectory = "";
+    }
 
     // Update is called once per frame
     void FixedUpdate()
@@ -63,18 +68,31 @@ public class CursorMovement : MonoBehaviour
         {
             if (keysCurrent[i] && !keysLast[i])
             {
+                if (!timerStarted)
+                {
+                    timerStarted = true;
+                    gameManager.StartTimer();
+                }
                 if (i == 0)
                 {
                     rb.AddForce(-controlForce, 0, 0, ForceMode.VelocityChange);
+                    GlobalControl.Instance.trajectory += " L ";
+                    GlobalControl.Instance.trajectory += Time.time;
                 } else if (i == 1)
                 {
                     rb.AddForce(controlForce, 0, 0, ForceMode.VelocityChange);
+                    GlobalControl.Instance.trajectory += " R ";
+                    GlobalControl.Instance.trajectory += Time.time;
                 } else if (i == 2)
                 {
                     rb.AddForce(0, 0, controlForce, ForceMode.VelocityChange);
+                    GlobalControl.Instance.trajectory += " U ";
+                    GlobalControl.Instance.trajectory += Time.time;
                 } else
                 {
                     rb.AddForce(0, 0, -controlForce, ForceMode.VelocityChange);
+                    GlobalControl.Instance.trajectory += " D ";
+                    GlobalControl.Instance.trajectory += Time.time;
                 }
                 break;
             }
@@ -84,110 +102,6 @@ public class CursorMovement : MonoBehaviour
         keysLast[1] = keysCurrent[1];
         keysLast[2] = keysCurrent[2];
         keysLast[3] = keysCurrent[3];
-
-        // Single keystroke implementation
-        /*
-        if (!keyPressed)
-        {
-
-            if (leftPressed)
-            {
-                if (!Input.GetKey("left"))
-                {
-                    leftPressed = false;
-                }
-            }
-            else
-            {
-                if (Input.GetKey("left"))
-                {
-                    //rb.AddForce(-controlForce, 0, 0, ForceMode.VelocityChange);
-                    transform.Translate(-controlFactor, 0, 0);
-                    leftPressed = true;
-                    keyPressed = true;
-                    if (!timerStarted)
-                    {
-                        timerStarted = true;
-                        gameManager.StartTimer();
-                    }
-                }
-            }
-
-            if (rightPressed)
-            {
-                if (!Input.GetKey("right"))
-                {
-                    rightPressed = false;
-                }
-            }
-            else
-            {
-                if (Input.GetKey("right"))
-                {
-                    //rb.AddForce(controlForce, 0, 0, ForceMode.VelocityChange);
-                    transform.Translate(controlFactor, 0, 0);
-                    rightPressed = true;
-                    keyPressed = true;
-                    if (!timerStarted)
-                    {
-                        timerStarted = true;
-                        gameManager.StartTimer();
-                    }
-                }
-            }
-
-            if (upPressed)
-            {
-                if (!Input.GetKey("up"))
-                {
-                    upPressed = false;
-                }
-            }
-            else
-            {
-                if (Input.GetKey("up"))
-                {
-                    //rb.AddForce(0, 0, controlForce, ForceMode.VelocityChange);
-                    transform.Translate(0, 0, controlFactor);
-                    upPressed = true;
-                    keyPressed = true;
-                    if (!timerStarted)
-                    {
-                        timerStarted = true;
-                        gameManager.StartTimer();
-                    }
-                }
-            }
-
-            if (downPressed)
-            {
-                if (!Input.GetKey("down"))
-                {
-                    downPressed = false;
-                }
-            }
-            else
-            {
-                if (Input.GetKey("down"))
-                {
-                    //rb.AddForce(0, 0, -controlForce, ForceMode.VelocityChange);
-                    transform.Translate(0, 0, -controlFactor);
-                    downPressed = true;
-                    keyPressed = true;
-                    if (!timerStarted)
-                    {
-                        timerStarted = true;
-                        gameManager.StartTimer();
-                    }
-                }
-            }
-        }
-
-        if (!Input.GetKey("left") && !Input.GetKey("right") && !Input.GetKey("up") && !Input.GetKey("down"))
-        {
-            keyPressed = false;
-        }
-        */
 
         /*
         if (Input.GetKey("left"))
@@ -294,9 +208,9 @@ public class CursorMovement : MonoBehaviour
             gameManager.Restart();
         }
 
-        // Add position
         gameManager.AddDistance(x_location, z_location, rb.position.x, rb.position.z);
         x_location = rb.position.x;
         z_location = rb.position.z;
+        
     }
 }

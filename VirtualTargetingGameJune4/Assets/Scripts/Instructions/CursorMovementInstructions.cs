@@ -25,6 +25,14 @@ public class CursorMovementInstructions : MonoBehaviour
     public Text timer;
     public bool textDisplayUsed = false;
 
+    // For single keystroke movement
+    private bool leftPressed = false;
+    private bool rightPressed = false;
+    private bool upPressed = false;
+    private bool downPressed = false;
+    private bool[] keysLast = new bool[] { false, false, false, false };
+    private bool[] keysCurrent = new bool[] { false, false, false, false };
+
     // Enable if using mouse control
     public bool trackpadMovement = false;
 
@@ -48,7 +56,50 @@ public class CursorMovementInstructions : MonoBehaviour
         direction.y = 0f;
         direction.z = 0f;
 
-        if (Input.GetKey("left"))
+        leftPressed = Input.GetKey("left");
+        rightPressed = Input.GetKey("right");
+        upPressed = Input.GetKey("up");
+        downPressed = Input.GetKey("down");
+        keysCurrent[0] = leftPressed;
+        keysCurrent[1] = rightPressed;
+        keysCurrent[2] = upPressed;
+        keysCurrent[3] = downPressed;
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (keysCurrent[i] && !keysLast[i])
+            {
+                if (!timerStarted)
+                {
+                    timerStarted = true;
+                    startTime = Time.time;
+                }
+                if (i == 0)
+                {
+                    rb.AddForce(-controlForce, 0, 0, ForceMode.VelocityChange);
+                }
+                else if (i == 1)
+                {
+                    rb.AddForce(controlForce, 0, 0, ForceMode.VelocityChange);
+                }
+                else if (i == 2)
+                {
+                    rb.AddForce(0, 0, controlForce, ForceMode.VelocityChange);
+                }
+                else
+                {
+                    rb.AddForce(0, 0, -controlForce, ForceMode.VelocityChange);
+                }
+                break;
+            }
+        }
+
+        keysLast[0] = keysCurrent[0];
+        keysLast[1] = keysCurrent[1];
+        keysLast[2] = keysCurrent[2];
+        keysLast[3] = keysCurrent[3];
+
+        /*if (Input.GetKey("left"))
         {
             if (!timerStarted)
             {
@@ -110,7 +161,7 @@ public class CursorMovementInstructions : MonoBehaviour
 
             rb.AddForce(force.x, force.y, force.z, ForceMode.VelocityChange);
             //tansform.Translate(controlFactor * direction.x / direction.magnitude, 0, controlFactor * direction.z / direction.magnitude);
-        }
+        } */
 
         // If using mouse/trackpad movement
         if (trackpadMovement)

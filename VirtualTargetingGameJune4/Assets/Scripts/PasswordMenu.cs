@@ -22,13 +22,13 @@ public class PasswordMenu : MonoBehaviour
         WWWForm form = new WWWForm();
         form.AddField("password", passwordField.text);
 
-        using (UnityWebRequest www = UnityWebRequest.Post("http://oeblviewpoints.000webhostapp.com//password.php", form))
+        using (UnityWebRequest www = UnityWebRequest.Post("http://oeblviewpoints.com//password.php", form))
         {
             yield return www.SendWebRequest();
 
             if (www.isNetworkError || www.isHttpError)
             {
-                informationDisplay.text = "Server communication failed.";
+                informationDisplay.text = ("Network/Http error " + www.error);
             }
             else if (www.downloadHandler.text == "0")
             {

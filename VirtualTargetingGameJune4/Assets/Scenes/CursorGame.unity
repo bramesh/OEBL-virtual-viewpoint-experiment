@@ -987,6 +987,10 @@ MonoBehaviour:
   - 0
   - 0
   catchTrialResults: 000000
+  refTime: 0
+  loadTime: 0
+  firstMovement: 0
+  completionTime: 0
 --- !u!4 &1580643115
 Transform:
   m_ObjectHideFlags: 0
@@ -1124,7 +1128,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70c597a844bb54261b4521fe908c3272, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controlForce: 15
+  controlForce: 8.57
   accelerationCoef: 0.4
   maxSpeed: 7
   rb: {fileID: 1660038624}
@@ -3935,7 +3939,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5006512736356990421}
   m_Layer: 0
-  m_Name: final low poly character  rigged
+  m_Name: Avatar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

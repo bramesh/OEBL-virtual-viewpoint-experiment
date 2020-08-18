@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
 using System.Diagnostics;
+using System.IO;
 
 public class GameManager : MonoBehaviour
 {
@@ -15,7 +16,10 @@ public class GameManager : MonoBehaviour
     private float startTime;
     private float endTime;
 
+    // For recording distance and path
     private float distance = 0;
+    private List<List<float>> path = new List<List<float>>();
+    
     private double x_diff;
     private double z_diff;
 
@@ -35,6 +39,7 @@ public class GameManager : MonoBehaviour
     // Start the trial timer and zero trial distance
     public void StartTimer()
     {
+        GlobalControl.Instance.firstMovement = Time.time;
         startTime = Time.time;
         ZeroDistance();
     }
@@ -42,12 +47,15 @@ public class GameManager : MonoBehaviour
     // Helper function to zero distance
     public void ZeroDistance()
     {
+        path = new List<List<float>>();
+        path.Add(new List<float> { 0, 0 });
         distance = 0f;
     }
 
     // End the trial timer
     public void EndTimer()
     {
+        GlobalControl.Instance.completionTime = Time.time;
         endTime = Time.time;
     }
 
@@ -56,6 +64,9 @@ public class GameManager : MonoBehaviour
     {
         x_diff = (double)(firstX - secondX);
         z_diff = (double)(firstZ - secondZ);
+        
+        //Enable if using path by coordinates
+        //path.Add(new List<float> { secondX, secondZ });
 
         distance = distance + (float)Math.Sqrt(x_diff * x_diff + z_diff * z_diff);
     }
@@ -91,14 +102,27 @@ public class GameManager : MonoBehaviour
         form.AddField("targetDirection", ((180 / Mathf.PI) * GlobalControl.Instance.targetConfig[GlobalControl.Instance.trialNumber % GlobalControl.numberOfTrials][1]).ToString());
         form.AddField("time", (endTime - startTime).ToString());
         form.AddField("distance", distance.ToString());
+        form.AddField("path", GlobalControl.Instance.trajectory);
+        form.AddField("loadTime", GlobalControl.Instance.loadTime.ToString());
+        form.AddField("firstMovement", GlobalControl.Instance.firstMovement.ToString());
+        form.AddField("completionTime", GlobalControl.Instance.completionTime.ToString());
 
         //WWW www = new WWW("http://oeblviewpoints.000webhostapp.com//trial.php", form);
         //yield return www;
         //http://localhost:8888/virtualexperiment/trial.php
 
-        using (UnityWebRequest www = UnityWebRequest.Post("http://oeblviewpoints.000webhostapp.com//trial.php", form))
+        using (UnityWebRequest www = UnityWebRequest.Post("http://oeblviewpoints.com//trial.php", form))
         {
             yield return www.SendWebRequest();
+
+            if (www.downloadHandler.text == "0")
+            {
+                UnityEngine.Debug.Log("Trial data inserted.");
+            }
+            else
+            {
+                UnityEngine.Debug.Log("Trial data push failed. Error #" + www.downloadHandler.text);
+            }
         }
 
         // If all trials have been completed, load the credit scene
@@ -125,7 +149,8 @@ public class GameManager : MonoBehaviour
 
         is_running = false;
 
-        // If it is time for a catch trial
+        // Enable if using catch trials
+        /*
         if (Array.Exists(GlobalControl.Instance.catchTrialLocations, element => element == GlobalControl.Instance.trialNumber))
         {
             UnityEngine.Debug.Log("In catch trial if");
@@ -133,7 +158,9 @@ public class GameManager : MonoBehaviour
         } else
         {
             Restart();
-        }
+        } */
+
+        Restart();
         
     }
 
@@ -166,5 +193,24 @@ public class GameManager : MonoBehaviour
         Camera.main.transform.rotation = Quaternion.Euler(x_rotation, y_rotation, z_rotation);
 
   }
+
+    private String PathToString(List<List<float>> pathList)
+    {
+        String output = "";
+
+        foreach (List<float> list in pathList)
+        {
+            output = String.Concat(output, "(", String.Format("{0:0.00}", list[0]), ",", String.Format("{0:0.00}", list[1]), ") ");
+        }
+
+        UnityEngine.Debug.Log(output);
+
+        // Remove last space
+        output = output.Substring(0, output.Length - 1);
+
+        UnityEngine.Debug.Log(output);
+        return output;
+
+    }
 
 }

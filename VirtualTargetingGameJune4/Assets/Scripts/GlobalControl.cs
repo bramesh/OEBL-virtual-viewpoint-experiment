@@ -53,6 +53,14 @@ public class GlobalControl : MonoBehaviour
     public float[] catchTrialTimes = new float[] { 0, 0, 0 };
     public bool[] catchTrialResults = new bool[] { false, false, false };
 
+    // Timestamp data holders
+    public float loadTime;            // Scene refresh timestamp
+    public float firstMovement;       // Timestamp upon first movement
+    public float completionTime;      // Timestamp level completion
+
+    // String to record arrow keystrokes
+    public string trajectory;
+
     void Awake(){
       if(Instance == null){
         DontDestroyOnLoad(gameObject);

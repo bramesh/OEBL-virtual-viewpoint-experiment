@@ -43,13 +43,36 @@ public class WelcomeMenu : MonoBehaviour
 
     int[] changedCameraPosition;
 
-    private int[][] cameraPositions = new int[][] { cam2, cam3, cam4, cam5, cam6, cam7, cam8, cam9, cam10, cam11, cam12, cam13, cam14, cam15, cam16, cam17, cam18, cam19, cam20, cam21, cam22, cam23, cam24 };
+    private int[][] cameraPositions = new int[][] { cam1, cam2, cam3, cam4, cam5, cam6, cam7, cam8, cam9, cam10, cam11, cam12, cam13, cam14, cam15, cam16, cam17, cam18, cam19, cam20, cam21, cam22, cam23, cam24 };
 
     public void CallLogin()
     {
         // Define camera positions
-        changedCameraPosition = cameraPositions[Int32.Parse(idField.text) % 23];
-        GlobalControl.Instance.cameraPositions = new int[][] { cam1, cam1, cam1, changedCameraPosition, changedCameraPosition, changedCameraPosition };
+        int subjectID = Int32.Parse(idField.text);
+        changedCameraPosition = cameraPositions[subjectID % 24];
+
+        if ((subjectID / 24) % 2 == 0)
+        {
+            if (subjectID % 2 == 0)
+            {
+                GlobalControl.Instance.cameraPositions = new int[][] { cam1, cam1, cam1, changedCameraPosition, changedCameraPosition, changedCameraPosition };
+            }
+            else
+            {
+                GlobalControl.Instance.cameraPositions = new int[][] { changedCameraPosition, changedCameraPosition, changedCameraPosition, cam1, cam1, cam1 };
+            }
+        } else
+        {
+            if (subjectID % 2 == 0)
+            {
+                GlobalControl.Instance.cameraPositions = new int[][] { changedCameraPosition, changedCameraPosition, changedCameraPosition, cam1, cam1, cam1 };
+            }
+            else
+            {
+                GlobalControl.Instance.cameraPositions = new int[][] { cam1, cam1, cam1, changedCameraPosition, changedCameraPosition, changedCameraPosition };
+            }
+        }
+        
 
         // Scramble target configs before first viewpoint
         Randomizer.Randomize(GlobalControl.Instance.targetConfig);
@@ -75,13 +98,13 @@ public class WelcomeMenu : MonoBehaviour
         WWWForm form = new WWWForm();
         form.AddField("id", idField.text);
 
-        using (UnityWebRequest www = UnityWebRequest.Post("http://oeblviewpoints.000webhostapp.com//login.php", form))
+        using (UnityWebRequest www = UnityWebRequest.Post("http://oeblviewpoints.com//login.php", form))
         {
             yield return www.SendWebRequest();
 
             if (www.isNetworkError || www.isHttpError)
             {
-                informationDisplay.text = "Server communication failed.";
+                informationDisplay.text = ("Network/Http error " + www.error);
             } else if (www.downloadHandler.text == "0")
             {
                 Debug.Log("User logged in successfully.");

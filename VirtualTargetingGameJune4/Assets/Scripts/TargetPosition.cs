@@ -26,6 +26,7 @@ public class TargetPosition : MonoBehaviour
         {
             bool goodAngle = false;
             float angle = UnityEngine.Random.Range(0f, 6.28f); // Random angle in radians
+            radius = 5f;
 
             while (!goodAngle)
             {

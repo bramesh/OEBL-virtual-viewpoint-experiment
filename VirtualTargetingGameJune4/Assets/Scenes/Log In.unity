@@ -462,6 +462,17 @@ MonoBehaviour:
   subjectID: 
   numberOfHits: 0
   testFall: 0
+  catchTrialLocations: 000000000000000000000000
+  catchTrialTimes:
+  - 0
+  - 0
+  - 0
+  catchTrialResults: 000000
+  refTime: 0
+  loadTime: 0
+  firstMovement: 0
+  completionTime: 0
+  trajectory: 
 --- !u!4 &324453107
 Transform:
   m_ObjectHideFlags: 0
